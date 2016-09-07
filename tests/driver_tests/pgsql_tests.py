@@ -10,22 +10,22 @@ class PgsqlTestCase(DatabaseTestCase, TestCase):
 
     def create_tables(self):
         self.db.execute("""
-            CREATE TABLE IF NOT EXISTS test_cities (
+            CREATE TABLE IF NOT EXISTS cities (
                 id SERIAL PRIMARY KEY,
                 name VARCHAR(254)
             )
         """)
         self.db.execute("""
-            CREATE TABLE IF NOT EXISTS test_users (
+            CREATE TABLE IF NOT EXISTS users (
                 id SERIAL PRIMARY KEY,
                 email VARCHAR(254)
             )
         """)
 
     def clear_tables(self):
-        self.db.execute('TRUNCATE TABLE test_cities RESTART IDENTITY')
-        self.db.execute('TRUNCATE TABLE test_users RESTART IDENTITY')
+        self.db.execute('TRUNCATE TABLE cities RESTART IDENTITY')
+        self.db.execute('TRUNCATE TABLE users RESTART IDENTITY')
 
     def test_select_last_insert_id(self):
-        id = self.db.query_value('INSERT INTO test_users (email) VALUES (?) RETURNING id', 'foo@bar.com')
+        id = self.db.query_value('INSERT INTO users (email) VALUES (?) RETURNING id', 'foo@bar.com')
         self.assertEqual(id, 1)
