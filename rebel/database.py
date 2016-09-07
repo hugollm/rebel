@@ -18,9 +18,9 @@ class Database(object):
         self.transaction_depth = 0
         self.rollback_issued = False
 
-    def sql(self, sql_string, *args):
+    def sql(self, sql_string, *args, **kwargs):
         sql = SqlBuilder(self)
-        sql.add(sql_string, *args)
+        sql.add(sql_string, *args, **kwargs)
         return sql
 
     def query(self, sql, *args, **kwargs):

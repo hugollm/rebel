@@ -51,6 +51,10 @@ class SqlBuilderTestCase(object):
         sql.add('WHERE id = :id', id=2)
         self.assertEqual(sql.query_one(), {'id': 2, 'name': 'Washington'})
 
+    def test_sql_builder_with_named_arguments_in_first_call(self):
+        sql = self.db.sql('SELECT * FROM cities WHERE id = :id', id=2)
+        self.assertEqual(sql.query_one(), {'id': 2, 'name': 'Washington'})
+
     def test_sql_builder_with_repeated_named_arguments_across_add_calls(self):
         users = [{'email': 'foo@bar.com'}, {'email': 'bar@foo.com'}]
         sql = self.db.sql('INSERT INTO users (email) VALUES')
