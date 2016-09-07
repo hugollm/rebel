@@ -1,4 +1,7 @@
 import re
+
+from .sql_builder import SqlBuilder
+from .transaction import Transaction
 from .exceptions import NotInsideTransaction, MixedPositionalAndNamedArguments
 
 
@@ -16,17 +19,31 @@ class Database(object):
         self.rollback_issued = False
 
     def sql(self, sql_string, *args):
-        sql = Sql(self)
+        sql = SqlBuilder(self)
         sql.add(sql_string, *args)
         return sql
 
     def query(self, sql, *args, **kwargs):
         self._connect_once()
-        sql, args = Sql._parse_kwargs(sql, args, kwargs)
+        sql, args = self._parse_kwargs(sql, args, kwargs)
         cursor = self.driver.query(sql, args)
         rows = self._fetch_rows_from_cursor(cursor)
         cursor.close()
         return rows
+
+    def _parse_kwargs(self, sql, args, kwargs):
+        if args and kwargs:
+            raise MixedPositionalAndNamedArguments()
+        if not kwargs:
+            return sql, args
+        key_pattern = ':[a-zA-Z_]+'
+        keys = re.findall(key_pattern, sql)
+        sql = re.sub(key_pattern, '?', sql)
+        args = []
+        for key in keys:
+            arg = kwargs[key[1:]]
+            args.append(arg)
+        return sql, args
 
     def _fetch_rows_from_cursor(self, cursor):
         columns = [column[0] for column in cursor.description]
@@ -37,7 +54,7 @@ class Database(object):
 
     def execute(self, sql, *args, **kwargs):
         self._connect_once()
-        sql, args = Sql._parse_kwargs(sql, args, kwargs)
+        sql, args = self._parse_kwargs(sql, args, kwargs)
         cursor = self.driver.query(sql, args)
         cursor.close()
 
@@ -92,80 +109,3 @@ class Database(object):
 
     def _inside_transaction(self):
         return self.transaction_depth > 0
-
-
-class Sql(object):
-
-    def __init__(self, database):
-        self.database = database
-        self.parts = []
-
-    def add(self, sql, *args, **kwargs):
-        sql, args = self._parse_kwargs(sql, args, kwargs)
-        self.parts.append({
-            'sql': sql,
-            'args': args,
-        })
-        return self
-
-    @staticmethod
-    def _parse_kwargs(sql, args, kwargs):
-        if args and kwargs:
-            raise MixedPositionalAndNamedArguments()
-        if not kwargs:
-            return sql, args
-        key_pattern = ':[a-zA-Z_]+'
-        keys = re.findall(key_pattern, sql)
-        sql = re.sub(key_pattern, '?', sql)
-        args = []
-        for key in keys:
-            arg = kwargs[key[1:]]
-            args.append(arg)
-        return sql, args
-
-    def back(self):
-        self.parts.pop()
-
-    def query(self):
-        sql, args = self._join_parts()
-        return self.database.query(sql, *args)
-
-    def query_one(self):
-        sql, args = self._join_parts()
-        return self.database.query_one(sql, *args)
-
-    def query_value(self):
-        sql, args = self._join_parts()
-        return self.database.query_value(sql, *args)
-
-    def query_values(self):
-        sql, args = self._join_parts()
-        return self.database.query_values(sql, *args)
-
-    def execute(self):
-        sql, args = self._join_parts()
-        self.database.execute(sql, *args)
-
-    def _join_parts(self):
-        sql = ''
-        args = []
-        for part in self.parts:
-            sql += part['sql'] + ' '
-            args += part['args']
-        return sql.strip(), args
-
-
-class Transaction(object):
-
-    def __init__(self, database, isolation_level):
-        self.database = database
-        self.isolation_level = isolation_level
-
-    def __enter__(self):
-        self.database.start_transaction(self.isolation_level)
-
-    def __exit__(self, exception_type, exception, traceback):
-        if exception:
-            self.database.rollback()
-        else:
-            self.database.commit()
