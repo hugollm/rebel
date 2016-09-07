@@ -103,25 +103,42 @@ class TransactionTestCase(object):
         email = self.db.query_value('SELECT email FROM users')
         self.assertEqual(email, 'bar@foo.com')
 
-    def test_database_transaction_with_informed_isolation_level(self):
+    def test_database_transaction_with_isolation_level_read_uncommitted(self):
+        self.db.start_transaction(self.db.READ_UNCOMMITTED)
+        self.db.execute('INSERT INTO users (email) VALUES (?)', 'foo@bar.com')
+        self.db.rollback()
+        user = self.db.query_one('SELECT * FROM users')
+        self.assertIsNone(user)
+
+    def test_database_transaction_with_isolation_level_read_committed(self):
+        self.db.start_transaction(self.db.READ_COMMITTED)
+        self.db.execute('INSERT INTO users (email) VALUES (?)', 'foo@bar.com')
+        self.db.rollback()
+        user = self.db.query_one('SELECT * FROM users')
+        self.assertIsNone(user)
+
+    def test_database_transaction_with_isolation_level_repeatable_read(self):
         self.db.start_transaction(self.db.REPEATABLE_READ)
         self.db.execute('INSERT INTO users (email) VALUES (?)', 'foo@bar.com')
         self.db.rollback()
         user = self.db.query_one('SELECT * FROM users')
         self.assertIsNone(user)
 
-    def test_all_isolation_levels(self):
-        self.db.start_transaction(self.db.READ_UNCOMMITTED)
-        self.db.start_transaction(self.db.READ_COMMITTED)
-        self.db.start_transaction(self.db.REPEATABLE_READ)
+    def test_database_transaction_with_isolation_level_serializable(self):
         self.db.start_transaction(self.db.SERIALIZABLE)
         self.db.execute('INSERT INTO users (email) VALUES (?)', 'foo@bar.com')
         self.db.rollback()
+        user = self.db.query_one('SELECT * FROM users')
+        self.assertIsNone(user)
+
+    def test_nested_database_transactions_with_defined_isolation_level(self):
+        self.db.start_transaction(self.db.SERIALIZABLE)
+        self.db.start_transaction(self.db.READ_UNCOMMITTED)
+        self.db.execute('INSERT INTO users (email) VALUES (?)', 'foo@bar.com')
         self.db.rollback()
         self.db.rollback()
-        self.db.rollback()
-        with self.assertRaises(NotInsideTransaction):
-            self.db.rollback()
+        user = self.db.query_one('SELECT * FROM users')
+        self.assertIsNone(user)
 
     def test_managed_transaction_automatically_commits(self):
         with self.db.transaction():
@@ -159,3 +176,12 @@ class TransactionTestCase(object):
                     self.db.execute('INSERT INTO users (email) VALUES (?)', 'foo@bar.com')
                     raise test_exception_class()
         self.assertEqual(self.db.transaction_depth, 0)
+
+    def test_managed_transaction_with_defined_isolation_level(self):
+        test_exception_class = type('TestException', (Exception,), {})
+        with self.assertRaises(test_exception_class):
+            with self.db.transaction(self.db.SERIALIZABLE):
+                self.db.execute('INSERT INTO users (email) VALUES (?)', 'foo@bar.com')
+                raise test_exception_class()
+        user = self.db.query_one('SELECT * FROM users')
+        self.assertIsNone(user)
