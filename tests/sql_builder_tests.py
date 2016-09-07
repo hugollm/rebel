@@ -11,6 +11,21 @@ class SqlBuilderTestCase(object):
             {'id': 3, 'name': 'Los Angeles'},
         ])
 
+    def test_sql_builder_query_without_add(self):
+        sql = self.db.sql('SELECT * FROM cities WHERE id > ?', 1)
+        self.assertEqual(sql.query(), [
+            {'id': 2, 'name': 'Washington'},
+            {'id': 3, 'name': 'Los Angeles'},
+        ])
+
+    def test_sql_builder_query_with_nothing_on_first_call(self):
+        sql = self.db.sql()
+        sql.add('SELECT * FROM cities WHERE id > ?', 1)
+        self.assertEqual(sql.query(), [
+            {'id': 2, 'name': 'Washington'},
+            {'id': 3, 'name': 'Los Angeles'},
+        ])
+
     def test_sql_builder_query_one(self):
         sql = self.db.sql('SELECT * FROM cities')
         sql.add('WHERE id = ?', 2)
