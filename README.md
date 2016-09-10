@@ -63,13 +63,13 @@ driver = PgsqlDriver(host='myhost.com', database='mydb', user='myuser', password
 db = Database(driver)
 ```
 
-If your database uses a different port, rather than the default, you can specify it as well:
+If your database uses a different port rather than the default, you can specify it as well:
 
 ```python
 driver = PgsqlDriver(host='myhost.com', port=5569, database='mydb', user='myuser', password='mypass')
 ```
 
-You can also connect via local unix socket (common in development). Just ommit the host and the password:
+You can also connect via Unix-domain sockets (common in development). Just ommit the host and the password:
 
 ```python
 driver = PgsqlDriver(database='mydb', user='postgres')
@@ -157,7 +157,7 @@ The `SqlBuilder` object has the same query methods as the database, with the sam
 
 ## Transactions
 
-Rebel ships with as nice syntax for transactions:
+Rebel ships with a nice syntax for transactions:
 
 ```python
 with db.transaction():
@@ -178,7 +178,7 @@ except:
     raise
 ```
 
-You are free to nest transactions with both sintaxes. Very useful in tests:
+You are free to nest transactions with both syntaxes. Very useful in tests:
 
 ```python
 class MyTestCase(TestCase):
