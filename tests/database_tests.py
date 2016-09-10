@@ -1,9 +1,7 @@
 from .query_tests import QueryTestCase
 from .sql_builder_tests import SqlBuilderTestCase
 from .transaction_tests import TransactionTestCase
-
 from rebel.database import Database
-from rebel.exceptions import NotInsideTransaction, MixedPositionalAndNamedArguments
 
 
 class DatabaseTestCase(QueryTestCase, SqlBuilderTestCase, TransactionTestCase):
