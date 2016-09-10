@@ -56,10 +56,12 @@ pip install psycopg2
 
 Then, instantiate a driver and create the database object:
 
+```python
 from rebel import Database, PgsqlDriver
 
 driver = PgsqlDriver(host='myhost.com', database='mydb', user='myuser', password='mypass')
 db = Database(driver)
+```
 
 If your database uses a different port, rather than the default, you can specify it as well:
 
