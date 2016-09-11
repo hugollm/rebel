@@ -1,0 +1,4 @@
+#!/bin/bash
+coverage run --source=rebel -m unittest tests
+coverage html
+exo-open htmlcov/index.html
