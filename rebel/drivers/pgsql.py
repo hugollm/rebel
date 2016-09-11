@@ -1,6 +1,3 @@
-import psycopg2
-
-
 class PgsqlDriver(object):
 
     def __init__(self, host=None, port=None, database=None, user=None, password=None):
@@ -11,6 +8,7 @@ class PgsqlDriver(object):
         self.password = password
 
     def connect(self, host=None, database=None, user=None, password=None, port=None):
+        import psycopg2
         self.connection = psycopg2.connect(
             host = self.host,
             port = self.port,

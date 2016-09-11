@@ -1,12 +1,10 @@
-import sqlite3
-
-
 class SqliteDriver(object):
 
     def __init__(self, database):
         self.database = database
 
     def connect(self):
+        import sqlite3
         self.connection = sqlite3.connect(self.database)
         self.autocommit = True
 
