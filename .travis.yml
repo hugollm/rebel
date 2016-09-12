@@ -5,6 +5,12 @@ python:
   - "3.5"
 services:
   - postgresql
+addons:
+  apt:
+    sources:
+      - travis-ci/sqlite3
+    packages:
+      - sqlite3
 install:
   - pip install -r requirements.txt
   - pip install coveralls
