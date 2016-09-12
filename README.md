@@ -2,7 +2,8 @@
 
 Rebel against the ORM empire with vanilla SQL for Python.
 
-[![Build Status](https://travis-ci.org/hugollm/rebel.svg?branch=master)](https://travis-ci.org/hugollm/rebel) [![Coverage Status](https://coveralls.io/repos/github/hugollm/rebel/badge.svg)](https://coveralls.io/github/hugollm/rebel)
+[![Build Status](https://travis-ci.org/hugollm/rebel.svg?branch=master)](https://travis-ci.org/hugollm/rebel)
+[![Coverage Status](https://coveralls.io/repos/github/hugollm/rebel/badge.svg?branch=master)](https://coveralls.io/github/hugollm/rebel?branch=master)
 
 
 ## Overview
