@@ -16,7 +16,7 @@ from rebel import Database, Sqlite
 driver = PgsqlDriver(database='rebel', user='postgres')
 db = Database(driver)
 
-db.execute('insert into users (name) values (?, ?)', 'John', 'Jane')
+db.execute('insert into users (name) values (?), (?)', 'John', 'Jane')
 db.query('select * from users') # [{id: 1, name: John}, {id: 2, name: Jane}]
 db.query_one('select * from users where id = ?', 1) # {id: 1, name: John}
 db.query_value('select id from users where id = :id', id=1) # 1
@@ -28,7 +28,9 @@ The connection only happens right before the first query. So you are free to pre
 
 ## Install
 
-Rebel will be available via pip very soon. Just hang in there.
+Rebel is available in the Python Package Index:
+
+    pip install rebel
 
 
 ## Connect to Sqlite
@@ -84,7 +86,7 @@ driver = PgsqlDriver(database='mydb', user='postgres')
 The `execute` method will execute an sql statement and return nothing.
 
 ```python
-db.execute('insert into users (name) values (?, ?)', 'John', 'Jane') # None
+db.execute('insert into users (name) values (?), (?)', 'John', 'Jane') # None
 ```
 
 The `query` method will return a list of dictionaries (a table), or an empty list.
