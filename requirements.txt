@@ -1,2 +1,6 @@
 coverage
 psycopg2
+
+check-manifest
+twine
+wheel

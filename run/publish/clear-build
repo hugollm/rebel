@@ -1,0 +1,4 @@
+#!/bin/bash
+rm -rfv rebel.egg-info/
+rm -rfv build/
+rm -rfv dist/

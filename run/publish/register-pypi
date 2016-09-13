@@ -1,0 +1,2 @@
+#!/bin/bash
+twine register -r dist/* --config-file .pypirc -r pypi

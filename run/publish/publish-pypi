@@ -1,0 +1,2 @@
+#!/bin/bash
+twine upload -r dist/* --config-file .pypirc -r pypi
