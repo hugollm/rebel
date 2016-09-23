@@ -11,7 +11,7 @@ Rebel against the ORM empire with vanilla SQL for Python.
 Rebel makes it simple to connect to a database and use vanilla SQL in Python. It's no rocket science, just a very thin layer of abstraction to make things fun again. Here's a peek on how to use it:
 
 ```python
-from rebel import Database, Sqlite
+from rebel import Database, PgsqlDriver
 
 driver = PgsqlDriver(database='rebel', user='postgres')
 db = Database(driver)
@@ -55,9 +55,7 @@ driver = SqliteDriver(':memory:')
 
 To connect to Postgresql, you'll be using the `PgsqlDriver`. First, you will need to install the package `psycopg2`:
 
-```python
-pip install psycopg2
-```
+    pip install psycopg2
 
 Then, instantiate a driver and create the database object:
 
@@ -126,8 +124,8 @@ Using vanilla SQL, you should never concatenate your parameters in the query. Th
 Rebel offers you two ways to pass arguments to queries. Positional and named arguments. You **may not** use both in the same query (it would raise an exception).
 
 ```python
-db.query_one('select * from users, where id = ?', 1) # {id: 1, name: 'John'}
-db.query_one('select * from users, where id = :id', id=id) # {id: 1, name: 'John'}
+db.query_one('select * from users where id = ?', 1) # {id: 1, name: 'John'}
+db.query_one('select * from users where id = :id', id=1) # {id: 1, name: 'John'}
 ```
 
 While positional arguments are fine for small queries, named arguments are more suited for the big ones:
